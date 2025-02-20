@@ -2,5 +2,8 @@
 
 Pick some subset of the information covered in your annual review article that you are interested in exploring in more detail. 
 
+My article discussed prediction based decision making and a subset of it mentioned its usage in the lending industry. 
+
 Identify the scope of your user guide - what will you cover? Specific software packages? When to use or not to use a specific technique?
 
+I plan on demonstrating the usage of R to predict loan approvals or denials. A software package I think i will demonstrate is the creditmodel package unless I can find something better. I think I will use the package to show how to create a model using prior data.
