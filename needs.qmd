@@ -2,8 +2,15 @@
 
 What does someone trying to accomplish your chosen task need help with? 
 
+Given that the users can do basic R tasks, they're likely to need help with using the different applicable functions in the creditmodel package. They'll likely need to know what parameters to use for the functions. Feature selection will be something that they'll need help with if it is a required step in the process.
+
 What parts are likely to be tricky? 
+One possible tricky part could be creating or finding a csv of lending data for which an approval decision has not yet been made. Another tricky part could be explaining to the user the purpose of the different steps of the model development process.
 
 What resources are already available on this topic that may be helpful? Look for e.g. software vignettes, package documentation, papers about software packages, and so on.
 
+There is an online toolkit pdf on the creditmodel package that looks helpful 
+@refaatCreditRiskScorecard2011
 
+There is also an R documentation website that gives information on all of the functions within the creditmodels package in R.
+@CreditmodelPackageRDocumentation
