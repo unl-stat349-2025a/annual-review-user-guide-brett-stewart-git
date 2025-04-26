@@ -1,60 +1,133 @@
-# Loan Prediction in R using tidymodels
-# Introduction
+---
+bibliography: references.bib
+---
 
-Throughout this user guide you will learn how to predict loan decisions based on real-life lending data using some features and principles contained within the tidymodels package in R. Knowing how to do this task could save you or your business a lot of money, as giving out loans to people who will not pay you back is a great way to lose money.
+# Loan Prediction in R Using tidymodels
 
-Some prerequisites for you to do this task involve having Rstudio installed on your device, and having the tidymodels package installed before attempting the task. It will also be helpful to have a csv file created by yourself or a potential applicant, which contains lending data that matches the format(same column names, numerical/categorical formatting, etc.), as the dataset you will find online. When teaching myself how to do this task I found that using a Microsoft Excel Spreadsheet and then converting the data to a csv upon saving it worked the best. One important step when creating this data is to omit the column and column data relating to loan_status, approvals, denials.
+## Introduction
 
-# Data Acquisition
+Throughout this user guide you will learn how to predict loan decisions based on real-life lending data using some features and principles contained within the `tidymodels` package in R. Knowing how to do this task could save you or your business a lot of money, as giving out loans to people who will not pay you back is a great way to lose money. Another great reason to know how to perform this task is it may give you insight as to whether or not certain information about yourself makes you seem more or less likely to be approved for a loan.
 
-Lending data can be easily found either externally through the internet, or internally through company records or systems. After identifying the source of lending data that you deem reputable and of high quality, download it to your computer. If you are reading this, it is assumed that you have basic proficiency in R or python, so read your chosen lending dataset into R and assign it to a variable of your choosing. For this guide the features our model will consider are
+Some prerequisites for you to do this task involve having Rstudio installed on your device, and having the `tidymodels` package installed before attempting the task. It will also be helpful to have all necessary files contained within the same working directory
 
-~[age], [gender], [occupation], [education_level], [marital_status], [income], [credit_score], and [loan_status]~
-
-# Formatting and Exploration of Data
-
-you can probably imagine what some of the possible data entries for each of these columns could be, with some of them being categorical and some of them numerical. With \[loan_status\] being a categorical feature that we want to predict, we must make it so that the feature \[loan_status\] is a factor that we have to classify as 'Approved' or 'Denied'. To do this you will designate the column as a factor by casting the \[loan_status\] column as a factor
-
-~data\$loan__status <- as.factor(data\$loan__status)~
-
-# Model Creation and Training
-
-Once the loan_status data column is updated as a factor, we begin to use some of the functions specific to the tidymodels package to create our model. the functions recipe(), step_normalize(), step_dummy (), and workflow() will all be used.
-
-recipe() defines steps for our model, similar to a food recipe. step_dummy() converts categorical variables into binary(dummy) variables since machine learning models cannot interpret categorical values, and step_normalize() normalizes numeric variables since features like age, credit score, and income are all on different scales.
-
-~modelRecipe <- recipe(loan_status~.,data=data) %>% step_dummy(all_nominal_predictors()) %>% step_normalize(all_numeric_predictors())`~
-
-Once the recipe has been made, we must decide which type of model we want to use to predict loan approvals or denials. Since it is assumed that you know what a confidence interval is, we will use logistic regression since it is probably a familiar topic. the engine 'glm' stands for generalized linear model. and the tidymodels function workflow() puts the recipe function and the model function together
+```{r}
+library(tidymodels)
+```
 
 
+It will also be helpful to have a comma separated value(.csv) file created by yourself or a potential applicant. This file will contain lending data that matches the format(same column names, numerical/categorical formatting, etc.), as the larger lending dataset you select either in company systems or on the internet from which you will build your model off of. For the purpose of this user guide we will use a hypothetical user-created comma separated value('Sashy.csv') file from an applicant named Sashy. The format should be structured like this
 
-~logisticModel <- logistic_reg() %>% set_engine("glm")~
+```{r}
+Sashy <- suppressWarnings(read.csv('Sashy.csv'))
+```
 
-~flow <- workflow() %>% add_model(log_model) %>% add_recipe(loan_recipe)~
+### Sashy
 
-
-# Data Splitting and Model Training
-
-In machine learning, data is split up into training sets and testing sets. The training set is used to train a model, and then the smaller test set of data evaluates the performance of the model. Using the tidymodels functions initial_split(), training() and fit() we will split up the data and train the model. Splitting the loan_status data into strata keeps somewhat even percentages of approvals and denials in each of the testing and training sets.
-
-
-~loanSplit <- initial_split(data, strata = loan_status)~
-
-~trainData <- training(loanSplit)~
-~trainedModel <- flow %>% fit(data = trainData)~
+| age | gender | occupation | education_level | marital_status | income | credit_score |
+|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| 23  | Female | Nurse      | Associate's     | Single         | 53000  | 670          |
 
 
-# Model Prediction Usage and Interpretation
+When you or someone else are filling out values for each data column, it is good practice to follow these guidelines, or else you run the risk of getting a unreliable results or other errors.
 
-To use our trained model to make predictions, we will use the function predict() which is not exclusive to tidymodels. To use it, call the function and then enter the name of your trained dataset, a comma, and then the assigned variable name of your created dataset that was mentioned during the introduction that you are trying to predict loan approvals/denials upon.
+-   `age` will be 2 digit integer value(no decimals).
+-   `gender` will either be **Male** or **Female**.
+-   `occupation` will vary and picking the one most related to the available options of **Engineer**, **Teacher**, **Student**, **Manager**, **Accountant**, **Nurse**, **Lawyer**, **Artist**, **IT**, **Doctor**, **Consultant**, **Analyst**, **Salesman**, **Marketing**, **Architect**, **Designer**, **Pharmacist**, **Researcher**, **Professor**, **Pilot**, **Receptionist**, **Banker**, **Writer**, **Chef**, **Veterinarian**, **Sales**, **HR**, **Electrician**, **Realtor**, **Photographer**, **Editor**, **Programmer**, **Dentist**, **Musician**, **Psychologist**, **Server**, **Software**, and **Stylist** would be for the best.
+-   `education_level` shall either be **High School**, **Associate's**, **Bachelor's**, **Master's**, or **Doctoral**.
+-   `marital_status` shall either be **Single** or **Married**.
+-   `income` should be a positive integer.
+-   `credit_score` is a three digit integer and ranges from 300 to 850.
+-   a column named `loan_status` shall be left blank or not included.
 
+When teaching myself how to perform this task I found that filling out the column name row and the user-specific data row in a Microsoft Excel Spreadsheet and then converting the data to a comma separated value(.csv) format upon saving it worked the best.
 
+::: warning
+**Warning:** One important step when creating this data is to omit the column and column data relating to loan_status, approvals, denials.
+:::
 
-~ADprediction <- predict(trainedModel, yourData)~
+## Data Acquisition
+
+Lending data can be easily found either externally through the internet, or internally through company records or systems. After identifying the source of lending data that you deem reputable and of high quality, download it to your computer. This guide assumes that you have basic proficiency in R, so read your chosen lending dataset into R and assign it to a variable of your choosing. For this guide the features our model will consider are
+
+``` r
+[age], [gender], [occupation], [education_level], [marital_status], [income], [credit_score], and [loan_status]
+```
+
+The lending data we will use for this exercise will use these features listed above, loaded in as `loan.csv`, and referenced onward as `data`, and can be found to download at [@chengetanai]
+
+```{r}
+data<-read.csv('loan.csv')
+head(data)
+```
+
+::: warning
+**Warning:** For future machine learning projects, it would be advisable to use a larger dataset than the one in this example, in order to get more accurate results.
+:::
+
+## Formatting and Exploration of Data
+
+You can probably imagine what some of the possible data entries for each of these columns could be, with some of them being categorical and some of them numerical. With `loan_status` being a categorical feature that we want to predict, we must make it so that the feature `loan_status` is a factor that we have to classify as 'Approved' or 'Denied'. To do this you will designate the column as a factor by casting the `loan_status` column as a factor
+
+```{r}
+data$loan_status <- as.factor(data$loan_status)
+```
+
+## Model Creation and Training
+
+Once the `loan_status` data column is updated as a factor, we begin to use some of the functions specific to the `tidymodels` package to create our model. the functions `recipe()`, `step_normalize()`, `step_dummy()`, and `workflow()` will all be used.
+
+`recipe()` defines steps for our model, similar to a food recipe. `step_dummy()` converts categorical variables into binary(dummy) variables since machine learning models cannot interpret categorical values directly. `step_normalize()` normalizes numeric variables since features like `age`, `credit score`, and `income` are all on different scales.
+
+```{r}
+modelRecipe <- recipe(loan_status~.,data=data) %>% step_dummy(all_nominal_predictors()) %>% step_normalize(all_numeric_predictors())
+```
+
+Once the recipe has been made, we must decide which type of model we want to use to predict loan approvals or denials. Since it is assumed that you are familiar with statistical methods, we will use logistic regression since it is probably a classification method you are familiar with. The engine 'glm' stands for generalized linear model. and the function `workflow()` puts the recipe function and the model function together.
+
+```{r}
+logisticModel <- logistic_reg() %>% set_engine("glm")
+
+flow <- workflow() %>% add_model(logisticModel) %>% add_recipe(modelRecipe)
+```
+
+Although logistic regression was the selected model and 'glm' was the selected engine for this example, there are a wide variety of options for both engines and models on the following website [@SearchParsnipModels].
+
+## Data Splitting and Model Training
+
+In machine learning, data is split up into training sets and testing sets. The training set is used to train a model, and then the smaller test set of data evaluates the performance of the model. Using the `tidymodels` functions `initial_split()`, `training()` and `fit()` we will split up the data and train the model. Splitting the `loan_status` data into strata keeps somewhat even percentages of approvals and denials in each of the testing and training sets.
+
+```{r}
+loanSplit <- initial_split(data, strata = loan_status)
+
+trainData <- training(loanSplit)
+
+trainedModel <- flow %>% fit(data = trainData)
+```
+
+## Model Prediction Usage and Interpretation
+
+To use our trained model to make predictions, we will use the function `predict()` which is not exclusive to `tidymodels`. To make a prediction, call the function `predict()` and then enter the name of your trained model followed by a comma and then the assigned variable name of your created data set that was mentioned during the introduction that you are trying to predict loan approvals/denials upon.
+
+```{r}
+ADprediction <- predict(trainedModel, Sashy)
+
 print(ADprediction)
+```
 
+When `ADprediction` is printed you will have your approval or denial outcome listed in your R console.
 
-# Conclusion
+## Conclusion
 
 In conclusion, this user guide should be of good use in helping you to predict whether you or a potential applicant are likely to receive approval for a loan or not. If you are thinking about applying for a loan and afraid that applying for too many of them could result in a credit inquiry appearing on your credit report, using this model could be a harm-free way to see if you're pre-qualified.
+
+If at any point in the future you would like to attempt this task again and forget the main steps, here is a flowchart that describes the process.
+
+![Process Refresher Flowchart](Flowchart.png)
+
+If you have a colleague or friend that is interested in learning more about how the machine learning process works, but doubtful in their abilities to accomplish such a task, this flowchart should give them assurance that it doesn't need to be very difficult.
+
+## Additional Resources
+
+Although this user guide should give you all of the available information that you should need to complete this task using the `tidymodels` package in R, you may want to explore the other capabilities of the `tidymodels` package. For this, I would refer you to the `tidymodels` website [@easilyi].
+
+If you would like to see a more technical look at what's going on behind the scenes of the many functions within the `tidymodels` package, and further information on some of the steps referenced within this user guide, there is a blog post on the Rviews website worth checking out [@viewsGentleIntroductionTidymodels2019].
